@@ -104,7 +104,7 @@ def pipe_score_check():
 pygame.init()
 screen = pygame.display.set_mode((576, 1024))
 clock = pygame.time.Clock()
-game_font = pygame.font.Font('04B_19.ttf', 40)
+game_font = pygame.font.Font('../assets/04B_19.ttf', 40)
 
 # Game Variables
 gravity = 0.3
