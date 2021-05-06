@@ -17,7 +17,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print(f"Recieved from socket:  {data}")
             try:
                 j_data = json.loads(data)
-                if j_data['z'] > 1500 or j_data['z'] < 300:
+                if j_data['z'] > 1200 or j_data['z'] < 900:
                     print("Detected")
             except:
                 print('Decode Error')
