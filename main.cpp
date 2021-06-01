@@ -40,7 +40,7 @@ SpwfSAInterface wifi(MBED_CONF_APP_WIFI_TX, MBED_CONF_APP_WIFI_RX);
 #endif // MBED_CONF_APP_WIFI_SHIELD == WIFI_IDW0XX1
 
 #endif
-
+InterruptIn button(BUTTON1);
 #define SCALE_MULTIPLIER    0.004
 
 
@@ -88,13 +88,21 @@ int scan_demo(WiFiInterface *wifi)
     return count;
 }
 
+bool pressed = false;
+
+void button_pressed(){
+    pressed = true;
+}
+void button_released(){
+    pressed = false;
+}
 void acc_server(NetworkInterface *net)
 {
     /* 
     TCPServer socket;
     TCPSocket* client;*/
     TCPSocket socket;
-    SocketAddress addr("192.168.50.242",65432);
+    SocketAddress addr("192.168.50.173",65432);
     nsapi_error_t response;
 
     int16_t pDataXYZ[3] = {0};
@@ -118,15 +126,29 @@ void acc_server(NetworkInterface *net)
 
     socket.set_blocking(1);
     while (1){
+        button.fall(&button_pressed);
+        button.rise(&button_released);
         ++sample_num;
+        int up;
+        if (!pressed){
         BSP_ACCELERO_AccGetXYZ(pDataXYZ);
         int x = pDataXYZ[0], y = pDataXYZ[1], z = pDataXYZ[2];
-        int len = sprintf(acc_json,"{\"x\":%d,\"y\":%d,\"z\":%d,\"s\":%d}",x, y, z, sample_num);
-        response = socket.send(acc_json,len);
+        if (x > 0){
+            up = -1;
+        }
+        else{
+            up = 1;
+        }
+        }
+        else{
+            up = 0;
+        }
+        int len = sprintf(acc_json,"{up: %d}", up);
+        response = socket.send(acc_json, len);
         if (0 >= response){
             printf("Error sending: %d\n", response);
         }
-        rtos::ThisThread::sleep_for(250);
+        rtos::ThisThread::sleep_for(1000);
     }
     socket.close();
 }
@@ -146,6 +168,6 @@ int main()
     printf("Netmask: %s\n", wifi.get_netmask());
     printf("Gateway: %s\n", wifi.get_gateway());
     printf("RSSI: %d\n\n", wifi.get_rssi());
-    BSP_ACCELERO_Init();   
+    BSP_ACCELERO_Init();
     acc_server(&wifi);
 }
