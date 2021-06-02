@@ -26,9 +26,9 @@ def update():
 			try:
 				if len(data) < 6:
 					action = (int(data[1]) - 1) * -8
-					if pipe_velocity>=5:
+					if pipe_velocity >= 5:
 						pipe_velocity = 5
-					if pipe_velocity<=2:
+					if pipe_velocity <= 2:
 						pipe_velocity = 2
 					pipe_velocity += (int(data[3]) - 1) * -1
 				else:
@@ -37,8 +37,8 @@ def update():
 				pass
 
 def draw_floor():
-	screen.blit(floor_surface, (floor_x_pos,900))
-	screen.blit(floor_surface, (floor_x_pos + 576,900))
+	screen.blit(floor_surface, (floor_x_pos, 900))
+	screen.blit(floor_surface, (floor_x_pos + 576, 900))
 
 def create_pipe():
 	random_pipe_pos = random.choice(pipe_height)
@@ -85,17 +85,17 @@ def bird_animation():
 
 def score_display(game_state):
 	if game_state == 'main_game':
-		score_surface = game_font.render(str(int(score)),True,(255,255,255))
-		score_rect = score_surface.get_rect(center = (288,100))
-		screen.blit(score_surface,score_rect)
+		score_surface = game_font.render(str(int(score)), True, (255, 255, 255))
+		score_rect = score_surface.get_rect(center = (288, 100))
+		screen.blit(score_surface, score_rect)
 	if game_state == 'game_over':
-		score_surface = game_font.render(f'Score: {int(score)}' ,True,(255,255,255))
-		score_rect = score_surface.get_rect(center = (288,100))
-		screen.blit(score_surface,score_rect)
+		score_surface = game_font.render(f'Score: {int(score)}', True, (255, 255, 255))
+		score_rect = score_surface.get_rect(center = (288, 100))
+		screen.blit(score_surface, score_rect)
 
-		high_score_surface = game_font.render(f'High score: {int(high_score)}',True,(255,255,255))
-		high_score_rect = high_score_surface.get_rect(center = (288,850))
-		screen.blit(high_score_surface,high_score_rect)
+		high_score_surface = game_font.render(f'High score: {int(high_score)}', True, (255, 255, 255))
+		high_score_rect = high_score_surface.get_rect(center = (288, 850))
+		screen.blit(high_score_surface, high_score_rect)
 
 def update_score(score, high_score):
 	if score > high_score:
@@ -118,9 +118,9 @@ def sign(x):
 	return 0
 
 pygame.init()
-screen = pygame.display.set_mode((576,1024))
+screen = pygame.display.set_mode((576, 1024))
 clock = pygame.time.Clock()
-game_font = pygame.font.Font('../assets/04B_19.ttf',40)
+game_font = pygame.font.Font('../assets/04B_19.ttf', 40)
 
 # Game Variables
 bird_movement = 0
@@ -138,7 +138,7 @@ floor_x_pos = 0
 bird_downflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
 bird_midflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
 bird_upflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
-bird_frames = [bird_downflap,bird_midflap,bird_upflap]
+bird_frames = [bird_downflap, bird_midflap, bird_upflap]
 bird_index = 0
 bird_surface = bird_frames[bird_index]
 bird_rect = bird_surface.get_rect(center = (100, 512))
@@ -150,7 +150,7 @@ pipe_surface = pygame.transform.scale2x(pipe_surface)
 pipe_list = []
 SPAWNPIPE = pygame.USEREVENT
 pygame.time.set_timer(SPAWNPIPE, 3000)
-pipe_height = [400, 600, 800]
+pipe_height = [400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
 
 game_over_surface = pygame.transform.scale2x(pygame.image.load('../assets/message.png').convert_alpha())
 game_over_rect = game_over_surface.get_rect(center = (288, 512))
@@ -177,10 +177,6 @@ while True:
 				bird_movement = 0
 				bird_movement += 8
 				flap_sound.play()
-			if event.key == pygame.K_SPACE and game_active:
-				bird_movement = 0
-				bird_movement += 0
-				flap_sound.play()
 			if event.key == pygame.K_SPACE and game_active == False:
 				game_active = True
 				pipe_velocity = 3
@@ -198,7 +194,7 @@ while True:
 			else:
 				bird_index = 0
 
-			bird_surface,bird_rect = bird_animation()
+			bird_surface, bird_rect = bird_animation()
 
 	screen.blit(bg_surface, (0, 0))
 
