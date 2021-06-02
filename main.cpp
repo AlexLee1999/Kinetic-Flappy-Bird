@@ -41,7 +41,7 @@ void button_released(){
 void acc_server(NetworkInterface *net)
 {
     TCPSocket socket;
-    SocketAddress addr("192.168.0.145", 10023);
+    SocketAddress addr("192.168.0.145", 10024);
     nsapi_error_t response;
 
     int16_t pDataXYZ[3] = {0};
@@ -67,14 +67,14 @@ void acc_server(NetworkInterface *net)
         BSP_ACCELERO_AccGetXYZ(pDataXYZ);
         int x = pDataXYZ[0], y = pDataXYZ[1], z = pDataXYZ[2];
         if (y > 0){
-            up = -1;
+            up = 0;
+        }
+        else{
+            up = 2;
+        }
         }
         else{
             up = 1;
-        }
-        }
-        else{
-            up = 0;
         }
         int len = sprintf(acc_json, "%d", up);
         response = socket.send(acc_json, len);
