@@ -28,68 +28,10 @@
 
 #define WIFI_IDW0XX1    2
 
-#if (defined(TARGET_DISCO_L475VG_IOT01A) || defined(TARGET_DISCO_F413ZH))
 #include "ISM43362Interface.h"
 ISM43362Interface wifi(false);
-
-#else // External WiFi modules
-
-#if MBED_CONF_APP_WIFI_SHIELD == WIFI_IDW0XX1
-#include "SpwfSAInterface.h"
-SpwfSAInterface wifi(MBED_CONF_APP_WIFI_TX, MBED_CONF_APP_WIFI_RX);
-#endif // MBED_CONF_APP_WIFI_SHIELD == WIFI_IDW0XX1
-
-#endif
 InterruptIn button(BUTTON1);
-#define SCALE_MULTIPLIER    0.004
-
-
-const char *sec2str(nsapi_security_t sec)
-{
-    switch (sec) {
-        case NSAPI_SECURITY_NONE:
-            return "None";
-        case NSAPI_SECURITY_WEP:
-            return "WEP";
-        case NSAPI_SECURITY_WPA:
-            return "WPA";
-        case NSAPI_SECURITY_WPA2:
-            return "WPA2";
-        case NSAPI_SECURITY_WPA_WPA2:
-            return "WPA/WPA2";
-        case NSAPI_SECURITY_UNKNOWN:
-        default:
-            return "Unknown";
-    }
-}
-
-int scan_demo(WiFiInterface *wifi)
-{
-    WiFiAccessPoint *ap;
-
-    printf("Scan:\n");
-
-    int count = wifi->scan(NULL,0);
-    printf("%d networks available.\n", count);
-
-    /* Limit number of network arbitrary to 15 */
-    count = count < 15 ? count : 15;
-
-    ap = new WiFiAccessPoint[count];
-    count = wifi->scan(ap, count);
-    for (int i = 0; i < count; i++)
-    {
-        printf("Network: %s secured: %s BSSID: %hhX:%hhX:%hhX:%hhx:%hhx:%hhx RSSI: %hhd Ch: %hhd\n", ap[i].get_ssid(),
-               sec2str(ap[i].get_security()), ap[i].get_bssid()[0], ap[i].get_bssid()[1], ap[i].get_bssid()[2],
-               ap[i].get_bssid()[3], ap[i].get_bssid()[4], ap[i].get_bssid()[5], ap[i].get_rssi(), ap[i].get_channel());
-    }
-
-    delete[] ap;
-    return count;
-}
-
 bool pressed = false;
-
 void button_pressed(){
     pressed = true;
 }
@@ -98,42 +40,33 @@ void button_released(){
 }
 void acc_server(NetworkInterface *net)
 {
-    /* 
-    TCPServer socket;
-    TCPSocket* client;*/
     TCPSocket socket;
-    SocketAddress addr("192.168.50.173",65432);
+    SocketAddress addr("192.168.0.145", 10023);
     nsapi_error_t response;
 
     int16_t pDataXYZ[3] = {0};
     char recv_buffer[9];
     char acc_json[64];
     int sample_num = 0;
-
-    
-
     // Open a socket on the network interface, and create a TCP connection to addr
     response = socket.open(net);
     if (0 != response){
         printf("Error opening: %d\n", response);
     }
     response = socket.connect(addr);
-    
     if (0 != response){
         printf("Error connecting: %d\n", response);
     }
-
-
     socket.set_blocking(1);
     while (1){
         button.fall(&button_pressed);
         button.rise(&button_released);
         ++sample_num;
         int up;
-        if (!pressed){
+        if (pressed){
         BSP_ACCELERO_AccGetXYZ(pDataXYZ);
         int x = pDataXYZ[0], y = pDataXYZ[1], z = pDataXYZ[2];
-        if (x > 0){
+        if (y > 0){
             up = -1;
         }
         else{
@@ -143,12 +76,12 @@ void acc_server(NetworkInterface *net)
         else{
             up = 0;
         }
-        int len = sprintf(acc_json,"{up: %d}", up);
+        int len = sprintf(acc_json, "%d", up);
         response = socket.send(acc_json, len);
         if (0 >= response){
             printf("Error sending: %d\n", response);
         }
-        rtos::ThisThread::sleep_for(1000);
+        rtos::ThisThread::sleep_for(100);
     }
     socket.close();
 }
