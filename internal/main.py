@@ -7,7 +7,7 @@ import threading
 
 
 HOST = '192.168.0.145'
-PORT = 10023
+PORT = 10024
 action = 0
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((HOST, PORT))
@@ -23,7 +23,10 @@ def update():
 			data = conn.recv(1024).decode('utf-8')
 			print(f"Recieved from socket:  {data}")
 			try:
-				action = int(data) * 8
+				if len(data) < 2:
+					action = (int(data) - 1) * -8
+				else:
+					pass
 			except:
 				pass
 
@@ -125,9 +128,9 @@ floor_surface = pygame.image.load('../assets/base.png').convert()
 floor_surface = pygame.transform.scale2x(floor_surface)
 floor_x_pos = 0
 
-bird_downflap = pygame.transform.scale2x(pygame.image.load('../assets/bluebird-downflap.png').convert_alpha())
-bird_midflap = pygame.transform.scale2x(pygame.image.load('../assets/bluebird-midflap.png').convert_alpha())
-bird_upflap = pygame.transform.scale2x(pygame.image.load('../assets/bluebird-upflap.png').convert_alpha())
+bird_downflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
+bird_midflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
+bird_upflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
 bird_frames = [bird_downflap,bird_midflap,bird_upflap]
 bird_index = 0
 bird_surface = bird_frames[bird_index]
@@ -193,7 +196,7 @@ while True:
 
 	if game_active:
 		# Bird
-		bird_movement = -1 * action
+		bird_movement = action
 		rotated_bird = rotate_bird(bird_surface)
 		bird_rect.centery += bird_movement
 		if bird_movement != 0:
