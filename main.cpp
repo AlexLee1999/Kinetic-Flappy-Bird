@@ -41,7 +41,7 @@ void button_released(){
 void acc_server(NetworkInterface *net)
 {
     TCPSocket socket;
-    SocketAddress addr("192.168.0.145", 10024);
+    SocketAddress addr("192.168.50.179", 10024);
     nsapi_error_t response;
 
     int16_t pDataXYZ[3] = {0};
@@ -62,21 +62,29 @@ void acc_server(NetworkInterface *net)
         button.fall(&button_pressed);
         button.rise(&button_released);
         ++sample_num;
-        int up;
-        if (pressed){
+        int up, right;
         BSP_ACCELERO_AccGetXYZ(pDataXYZ);
         int x = pDataXYZ[0], y = pDataXYZ[1], z = pDataXYZ[2];
-        if (y > 0){
-            up = 0;
-        }
-        else{
-            up = 2;
-        }
+        if (pressed){
+            if (y > 0){
+                up = 0;
+                right = 1;
+            }
+            else{
+                up = 2;
+                right = 1;
+            }
         }
         else{
             up = 1;
+            if (x > 0){
+                right = 0;
+            }
+            else{
+                right = 2;
+            }
         }
-        int len = sprintf(acc_json, "%d", up);
+        int len = sprintf(acc_json, "{%d,%d}", up, right);
         response = socket.send(acc_json, len);
         if (0 >= response){
             printf("Error sending: %d\n", response);
