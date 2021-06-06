@@ -24,15 +24,13 @@ def update():
 			data = conn.recv(1024).decode('utf-8')
 			print(f"Recieved from socket:  {data}")
 			try:
-				if len(data) < 6:
-					action = (int(data[1]) - 1) * -8
-					if pipe_velocity >= 5:
-						pipe_velocity = 5
-					if pipe_velocity <= 2:
-						pipe_velocity = 2
-					pipe_velocity += (int(data[3]) - 1) * -1
-				else:
-					pass
+				action = (int(data[1]) - 1) * -8
+				if pipe_velocity >= 5:
+					pipe_velocity = 5
+				if pipe_velocity <= 2:
+					pipe_velocity = 2
+				pipe_velocity += (int(data[3]) - 1) * -1
+			
 			except:
 				pass
 
