@@ -18,6 +18,8 @@
 
 #include "mbed.h"
 #include "TCPSocket.h"
+#include <cstdio>
+#include <queue>
 #include "stm32l475e_iot01_hsensor.h"
 #include "stm32l475e_iot01_psensor.h"
 #include "stm32l475e_iot01_magneto.h"
@@ -32,19 +34,39 @@
 ISM43362Interface wifi(false);
 InterruptIn button(BUTTON1);
 bool pressed = false;
+bool queue_is_init = false;
+queue<int> Q;
+void queue_init(){
+    int size = Q.size();
+    for (int i=0; i< size; ++i){
+        Q.pop();
+    }
+    for (int i=0; i<5; ++i){
+        Q.push(0);
+    }
+    queue_is_init = true;
+}
 void button_pressed(){
     pressed = true;
 }
 void button_released(){
     pressed = false;
+    if(!queue_is_init){
+      queue_init();  
+    }
 }
+
 void acc_server(NetworkInterface *net)
 {
     TCPSocket socket;
-    SocketAddress addr("192.168.50.179", 10024);
+    SocketAddress addr("192.168.0.145", 10024);
     nsapi_error_t response;
-
     int16_t pDataXYZ[3] = {0};
+    queue_init();
+    int avg_sum = 0;
+    int oldest;
+    int up;
+    float avg;
     char recv_buffer[9];
     char acc_json[64];
     int sample_num = 0;
@@ -62,34 +84,33 @@ void acc_server(NetworkInterface *net)
         button.fall(&button_pressed);
         button.rise(&button_released);
         ++sample_num;
-        int up, right;
-        BSP_ACCELERO_AccGetXYZ(pDataXYZ);
-        int x = pDataXYZ[0], y = pDataXYZ[1], z = pDataXYZ[2];
-        if (pressed){
-            if (y > 0){
+        if (pressed) {
+            BSP_ACCELERO_AccGetXYZ(pDataXYZ);
+            int x = pDataXYZ[0], y = pDataXYZ[1], z = pDataXYZ[2];
+            oldest = Q.front();
+            Q.pop();
+            Q.push(y);
+            queue_is_init = false;
+            avg_sum -= oldest;
+            avg_sum += y;
+            avg = avg_sum / 5;
+            if (avg > 0){
                 up = 0;
-                right = 1;
             }
             else{
                 up = 2;
-                right = 1;
             }
         }
         else{
             up = 1;
-            if (x > 0){
-                right = 0;
-            }
-            else{
-                right = 2;
-            }
         }
-        int len = sprintf(acc_json, "{%d,%d}", up, right);
-        response = socket.send(acc_json, len);
-        if (0 >= response){
-            printf("Error sending: %d\n", response);
-        }
-        rtos::ThisThread::sleep_for(100);
+        printf("%d\n", up);
+        // int len = sprintf(acc_json, "%d", up);
+        // response = socket.send(acc_json, len);
+        // if (0 >= response){
+        //     printf("Error sending: %d\n", response);
+        // }
+        rtos::ThisThread::sleep_for(10ms);
     }
     socket.close();
 }
