@@ -19,6 +19,7 @@
 #include "mbed.h"
 #include "TCPSocket.h"
 #include <cstdio>
+#include <iterator>
 #include <queue>
 #include "stm32l475e_iot01_hsensor.h"
 #include "stm32l475e_iot01_psensor.h"
@@ -35,14 +36,13 @@ ISM43362Interface wifi(false);
 InterruptIn button(BUTTON1);
 bool pressed = false;
 bool queue_is_init = false;
-queue<int> Q;
+deque<int> Q;
 void queue_init(){
-    int size = Q.size();
-    for (int i=0; i< size; ++i){
-        Q.pop();
+    if(!Q.empty()){
+        Q.clear();
     }
-    for (int i=0; i<5; ++i){
-        Q.push(0);
+    for (int i=0; i<4; ++i){
+        Q.push_back(0);
     }
     queue_is_init = true;
 }
@@ -55,6 +55,17 @@ void button_released(){
       queue_init();  
     }
 }
+float calculate_queue(){
+    float parameter[4] = {0.1, 0.15, 0.2, 0.55};
+    int count = 0;
+    float result = 0;
+    for(auto it = std::begin(Q); it!=std::end(Q); ++it){
+        float res = (*it) * parameter[count];
+        result += res;
+        count++;
+    }
+    return  result;
+}
 
 void acc_server(NetworkInterface *net)
 {
@@ -64,7 +75,6 @@ void acc_server(NetworkInterface *net)
     int16_t pDataXYZ[3] = {0};
     queue_init();
     int avg_sum = 0;
-    int oldest;
     int up;
     float avg;
     char recv_buffer[9];
@@ -87,22 +97,28 @@ void acc_server(NetworkInterface *net)
         if (pressed) {
             BSP_ACCELERO_AccGetXYZ(pDataXYZ);
             int x = pDataXYZ[0], y = pDataXYZ[1], z = pDataXYZ[2];
-            oldest = Q.front();
-            Q.pop();
-            Q.push(y);
+            Q.pop_front();
+            Q.push_back(y);
+            avg = calculate_queue();
             queue_is_init = false;
-            avg_sum -= oldest;
-            avg_sum += y;
-            avg = avg_sum / 5;
-            if (avg > 0){
+            if (avg > 500){
                 up = 0;
             }
-            else{
+            else if (avg <= 500 && avg > 100) {
+                up = 1;
+            }
+            else if (avg < -500){
+                up = 4;
+            }
+            else if (avg >= -500 && avg < -100) {
+                up = 3;
+            }
+            else {
                 up = 2;
             }
         }
         else{
-            up = 1;
+            up = 2;
         }
         printf("%d\n", up);
         // int len = sprintf(acc_json, "%d", up);
