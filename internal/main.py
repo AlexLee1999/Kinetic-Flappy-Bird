@@ -6,31 +6,30 @@ import json
 import threading
 
 
-HOST = '192.168.50.179'
-PORT = 10024
+HOST = '192.168.50.173'
+PORT = 54087
 action = 0
 pipe_velocity = 3
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+	# s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((HOST, PORT))
     print(f'Bind {HOST}:{PORT}')
     s.listen()
     conn, addr = s.accept()
 
 def update():
-	global action, pipe_velocity
+	global action
 	with conn:
 		print(f'Connected by {addr}')
 		while True:
 			data = conn.recv(1024).decode('utf-8')
-			print(f"Recieved from socket:  {data}")
-			try:
-				action = (int(data[1]) - 1) * -8
-				if pipe_velocity >= 5:
-					pipe_velocity = 5
-				if pipe_velocity <= 2:
-					pipe_velocity = 2
-				pipe_velocity += (int(data[3]) - 1) * -1
 			
+			try:
+				
+					
+				print(data[0])
+				action = ((int(data[0]) - 2)* -8)
+					
 			except:
 				pass
 
@@ -147,7 +146,7 @@ pipe_surface = pygame.image.load('../assets/pipe-green.png')
 pipe_surface = pygame.transform.scale2x(pipe_surface)
 pipe_list = []
 SPAWNPIPE = pygame.USEREVENT
-pygame.time.set_timer(SPAWNPIPE, 3000)
+pygame.time.set_timer(SPAWNPIPE, 1200)
 pipe_height = [400, 425, 450, 475, 500, 525, 550, 575, 600, 625, 650, 675, 700, 725, 750, 775, 800]
 
 game_over_surface = pygame.transform.scale2x(pygame.image.load('../assets/message.png').convert_alpha())
@@ -208,7 +207,7 @@ while True:
 		screen.blit(rotated_bird, bird_rect)
 		game_active = check_collision(pipe_list)
 		# Pipes
-		print(pipe_velocity)
+		# print(pipe_velocity)
 		pipe_list = move_pipes(pipe_list)
 		draw_pipes(pipe_list)
 		# Score
