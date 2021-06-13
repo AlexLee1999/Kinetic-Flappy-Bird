@@ -1,116 +1,50 @@
-/* WiFi Example
- * Copyright (c) 2018 ARM Limited
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-
-
 #include "mbed.h"
 #include "TCPSocket.h"
-#include <cstdio>
-#include <iterator>
-#include <queue>
-#include "stm32l475e_iot01_hsensor.h"
-#include "stm32l475e_iot01_psensor.h"
-#include "stm32l475e_iot01_magneto.h"
-#include "stm32l475e_iot01_gyro.h"
 #include "stm32l475e_iot01_accelero.h"
-
-
+#include "stm32l475e_iot01_gyro.h"
+#include <cstdint>
+#include <string>
+#include <queue>
 
 #define WIFI_IDW0XX1    2
 
 #include "ISM43362Interface.h"
 ISM43362Interface wifi(false);
-InterruptIn button(BUTTON1);
-bool pressed = false;
-bool queue_is_init = false;
-deque<int> Q;
-void queue_init(){
-    if(!Q.empty()){
-        Q.clear();
-    }
-    for (int i=0; i<4; ++i){
-        Q.push_back(0);
-    }
-    queue_is_init = true;
-}
-void button_pressed(){
-    pressed = true;
-}
-void button_released(){
-    pressed = false;
-    if(!queue_is_init){
-      queue_init();  
-    }
-}
-float calculate_queue(){
-    float parameter[4] = {0.1, 0.15, 0.2, 0.55};
-    int count = 0;
-    float result = 0;
-    for(auto it = std::begin(Q); it!=std::end(Q); ++it){
-        float res = (*it) * parameter[count];
-        result += res;
-        count++;
-    }
-    return  result;
-}
 
-void acc_server(NetworkInterface *net)
-{
-    TCPSocket socket;
-    SocketAddress addr("192.168.0.145", 10024);
-    nsapi_error_t response;
-    int16_t pDataXYZ[3] = {0};
-    queue_init();
-    int avg_sum = 0;
-    int up;
-    float avg;
-    char recv_buffer[9];
-    char acc_json[64];
-    int sample_num = 0;
-    // Open a socket on the network interface, and create a TCP connection to addr
-    response = socket.open(net);
-    if (0 != response){
-        printf("Error opening: %d\n", response);
+
+#define SCALE_MULTIPLIER    0.004
+static EventQueue event_queue(16 * EVENTS_EVENT_SIZE);
+#define IP_address  "192.168.50.179"
+#define Port_number 54087
+#define SEND_INT    5
+
+DigitalIn button(BUTTON1);
+// InterruptIn user_button(BUTTON1);
+SocketAddress addr(IP_address, Port_number);
+
+class Sensor{
+public:
+    Sensor(events::EventQueue &event_queue):_event_queue(event_queue){
+        BSP_ACCELERO_Init();    
     }
-    response = socket.connect(addr);
-    if (0 != response){
-        printf("Error connecting: %d\n", response);
-    }
-    socket.set_blocking(1);
-    while (1){
-        button.fall(&button_pressed);
-        button.rise(&button_released);
-        ++sample_num;
-        if (pressed) {
-            BSP_ACCELERO_AccGetXYZ(pDataXYZ);
-            int x = pDataXYZ[0], y = pDataXYZ[1], z = pDataXYZ[2];
+
+    void getAction(uint8_t& up){
+        if (!button) {
+            BSP_ACCELERO_AccGetXYZ(_pAccDataXYZ);
             Q.pop_front();
-            Q.push_back(y);
+            Q.push_back(_pAccDataXYZ[1]);
             avg = calculate_queue();
             queue_is_init = false;
             if (avg > 500){
                 up = 0;
             }
-            else if (avg <= 500 && avg > 100) {
+            else if (avg <= 500 && avg > 50) {
                 up = 1;
             }
             else if (avg < -500){
                 up = 4;
             }
-            else if (avg >= -500 && avg < -100) {
+            else if (avg >= -500 && avg < -50) {
                 up = 3;
             }
             else {
@@ -118,34 +52,120 @@ void acc_server(NetworkInterface *net)
             }
         }
         else{
+            queue_init();
             up = 2;
         }
-        printf("%d\n", up);
-        // int len = sprintf(acc_json, "%d", up);
-        // response = socket.send(acc_json, len);
-        // if (0 >= response){
-        //     printf("Error sending: %d\n", response);
-        // }
-        rtos::ThisThread::sleep_for(10ms);
     }
-    socket.close();
-}
+
+private:
+    events::EventQueue &_event_queue;
+    int16_t _pAccDataXYZ[3] = {0};
+    bool queue_is_init = false;
+    deque<int> Q;
+    float avg;
+    void queue_init(){
+        if(!Q.empty()){
+            Q.clear();
+        }
+        for (int i=0; i<2; ++i){
+            Q.push_back(0);
+        }
+        queue_is_init = true;
+    }
+    float calculate_queue(){
+        float parameter[2] = { 0.2, 0.8};
+        int count = 0;
+        float result = 0;
+        for(auto it = std::begin(Q); it!=std::end(Q); ++it){
+            float res = (*it) * parameter[count];
+            result += res;
+            count++;
+        }
+        return result;
+    }
+};
+
+class WIFI{
+public:
+    WIFI( NetworkInterface *wifi ,Sensor * sensor, events::EventQueue &event_queue, TCPSocket* socket ): _wifi(wifi),_sensor(sensor), _event_queue(event_queue), _led1(LED1, 1), _socket(socket) {
+        connect();
+    }
+    void connect(){
+        printf("\nConnecting to %s...\n", MBED_CONF_APP_WIFI_SSID);
+        int ret = wifi.connect(MBED_CONF_APP_WIFI_SSID, MBED_CONF_APP_WIFI_PASSWORD, NSAPI_SECURITY_WPA_WPA2);
+        if (ret != 0) {
+            printf("\nConnection error\n");
+        }
+        printf("Success\n\n");
+        printf("MAC: %s\n", wifi.get_mac_address());
+        printf("IP: %s\n", wifi.get_ip_address());
+        printf("Netmask: %s\n", wifi.get_netmask());
+        printf("Gateway: %s\n", wifi.get_gateway());
+        printf("RSSI: %d\n\n", wifi.get_rssi());
+        printf("\nConnecting to %s...\n", MBED_CONF_APP_WIFI_SSID);
+        nsapi_error_t response;
+        response = _socket->open(_wifi);
+        if (0 != response){
+            printf("Error opening: %d\n", response);
+        }
+        
+        response = _socket->connect(addr);
+    
+        if (0 != response){
+            printf("Error connecting: %d\n", response);
+        }
+
+
+        _socket->set_blocking(1);
+        _event_queue.call_every(SEND_INT, this, &WIFI::send_data);
+        _event_queue.call_every(500, this, &WIFI::blink);
+    }
+
+    ~WIFI() {
+        _socket->close();
+        _wifi->disconnect();
+    }
+
+    void blink() {
+        _led1 = !_led1;
+    }
+
+
+    void send_data() {
+        char data[64];
+        nsapi_error_t response;
+        uint8_t up;
+        _sensor->getAction(up);
+        int len = sprintf(data,"%d",up);
+        // printf("%d\n", up);
+        response = _socket->send(data, len);
+        if (0 >= response){
+            printf("Error sending: %d\n", response);
+        }
+    }
+private:
+    NetworkInterface *    _wifi;
+    Sensor *              _sensor;
+    DigitalOut            _led1;
+    events::EventQueue    &_event_queue;
+    TCPSocket*            _socket;
+};
+
+
+TCPSocket socket;
+Sensor _sensor(event_queue);
+WIFI   _wifi(&wifi, &_sensor, event_queue, &socket);
+
+// void reset() {
+//     event_queue.call(callback(&_sensor, &Sensor::Calibrate));
+//     event_queue.call(callback(&_wifi  , &WIFI::connect));
+// }
 
 int main()
 {
-    printf("\nConnecting to %s...\n", MBED_CONF_APP_WIFI_SSID);
-    //wifi.set_network("192.168.130.105","255.255.255.0","192.168.130.254");
-    int ret = wifi.connect(MBED_CONF_APP_WIFI_SSID, MBED_CONF_APP_WIFI_PASSWORD, NSAPI_SECURITY_WPA_WPA2);
-    if (ret != 0) {
-        printf("\nConnection error\n");
-        return -1;
-    }
-    printf("Success\n\n");
-    printf("MAC: %s\n", wifi.get_mac_address());
-    printf("IP: %s\n", wifi.get_ip_address());
-    printf("Netmask: %s\n", wifi.get_netmask());
-    printf("Gateway: %s\n", wifi.get_gateway());
-    printf("RSSI: %d\n\n", wifi.get_rssi());
-    BSP_ACCELERO_Init();
-    acc_server(&wifi);
+   printf("=========================================\n");
+   printf("==Pikachu Volleyball(STM32 and WiFi)== \n");
+   printf("=========================================\n");
+   event_queue.dispatch_forever();
+   printf("\nDone\n");
 }
