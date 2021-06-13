@@ -6,7 +6,7 @@ import json
 import threading
 
 
-HOST = '192.168.50.173'
+HOST = '192.168.50.179'
 PORT = 54087
 action = 0
 pipe_velocity = 3
@@ -23,13 +23,13 @@ def update():
 		print(f'Connected by {addr}')
 		while True:
 			data = conn.recv(1024).decode('utf-8')
-			
+
 			try:
-				
-					
+
+
 				print(data[0])
 				action = ((int(data[0]) - 2)* -8)
-					
+
 			except:
 				pass
 
