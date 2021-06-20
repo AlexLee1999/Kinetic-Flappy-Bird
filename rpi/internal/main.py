@@ -131,7 +131,7 @@ floor_x_pos = 0
 bird_downflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
 bird_midflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
 bird_upflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
-bird_frames = [bird_downflap, bird_midflap, bird_upflap]
+bird_frames = [bird_downflap, bir		# print(pipe_velocity)d_midflap, bird_upflap]
 bird_index = 0
 bird_surface = bird_frames[bird_index]
 bird_rect = bird_surface.get_rect(center = (100, 512))
