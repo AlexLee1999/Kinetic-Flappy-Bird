@@ -23,13 +23,9 @@ def update():
 		print(f'Connected by {addr}')
 		while True:
 			data = conn.recv(1024).decode('utf-8')
-
 			try:
-
-
 				print(data[0])
 				action = ((int(data[0]) - 2)* -8)
-
 			except:
 				pass
 
@@ -190,9 +186,7 @@ while True:
 				bird_index += 1
 			else:
 				bird_index = 0
-
 			bird_surface, bird_rect = bird_animation()
-
 	screen.blit(bg_surface, (0, 0))
 
 	if game_active:
@@ -207,7 +201,6 @@ while True:
 		screen.blit(rotated_bird, bird_rect)
 		game_active = check_collision(pipe_list)
 		# Pipes
-		# print(pipe_velocity)
 		pipe_list = move_pipes(pipe_list)
 		draw_pipes(pipe_list)
 		# Score
@@ -217,14 +210,10 @@ while True:
 		screen.blit(game_over_surface, game_over_rect)
 		high_score = update_score(score, high_score)
 		score_display('game_over')
-
-
 	# Floor
 	floor_x_pos -= 1
 	draw_floor()
 	if floor_x_pos <= -576:
 		floor_x_pos = 0
-
-
 	pygame.display.update()
 	clock.tick(120)

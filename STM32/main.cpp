@@ -16,15 +16,13 @@ static EventQueue event_queue(16 * EVENTS_EVENT_SIZE);
 #define SEND_INT    5
 
 DigitalIn button(BUTTON1);
-// InterruptIn user_button(BUTTON1);
 SocketAddress addr(IP_address, Port_number);
 
 class Sensor{
 public:
     Sensor(events::EventQueue &event_queue):_event_queue(event_queue){
-        BSP_ACCELERO_Init();    
+        BSP_ACCELERO_Init();
     }
-
     void getAction(uint8_t& up){
         if (!button) {
             BSP_ACCELERO_AccGetXYZ(_pAccDataXYZ);
@@ -105,18 +103,13 @@ public:
         if (0 != response){
             printf("Error opening: %d\n", response);
         }
-        
         response = _socket->connect(addr);
-    
         if (0 != response){
             printf("Error connecting: %d\n", response);
         }
-
-
         _socket->set_blocking(1);
         _event_queue.call_every(SEND_INT, this, &WIFI::send_data);
     }
-
     ~WIFI() {
         _socket->close();
         _wifi->disconnect();
@@ -140,18 +133,11 @@ private:
     TCPSocket*            _socket;
 };
 
-
 TCPSocket socket;
 Sensor _sensor(event_queue);
 WIFI   _wifi(&wifi, &_sensor, event_queue, &socket);
 
-// void reset() {
-//     event_queue.call(callback(&_sensor, &Sensor::Calibrate));
-//     event_queue.call(callback(&_wifi  , &WIFI::connect));
-// }
-
 int main()
 {
    event_queue.dispatch_forever();
-   printf("\nDone\n");
 }
