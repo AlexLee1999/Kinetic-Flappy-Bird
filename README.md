@@ -13,12 +13,14 @@ This is the code of Embedded System Lab Final Project
 Author : B06203017李俊諺 (Chun-Yen Lee)，B06504016林家宏 (Chia-Hung Lin)，B06701214王群博 (Cyun-Bo Wang)  
 
 ### Usage
-
+```
+pip install -r requirements.txt
+python3 rpi/internal/main.py
+```
 
 ### Requirements
  - Python >= 3.6
  - Pygame
- - 
 
 ### Demo
 
