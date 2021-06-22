@@ -1,4 +1,4 @@
-# ESLab Final Flappy Bird
+# Embedded System Lab Final Project - Flappy Bird
 ![](./fig/bird.jpg)
 
 ### Table of content
