@@ -19,8 +19,11 @@ Authors : B06203017 李俊諺 (Chun-Yen Lee)，B06504016 林家宏 (Chia-Hung Li
 pip install -r requirements.txt
 python3 rpi/internal/main.py
 ```
-- Change SSID and Password in /Stm/mbed_app.json
-- 
+- Run the Program
+  - Change SSID and Password in STM32/mbed_app.json
+  - Add BSP_B-L475E-IOT01 to library in Mbed Studio
+  - Replace main.cpp in the program
+
 ### Requirements
  - Python >= 3.6
  - Pygame
@@ -47,3 +50,5 @@ Reference of the original game :
 https://www.youtube.com/watch?v=UZg49z76cLw  
 MbedOs documents with board sensors :  
 https://os.mbed.com/teams/ST/code/DISCO_L475VG_IOT01-Sensors-BSP/  
+BSP_B-L475E-IOT01 Library  
+https://os.mbed.com/teams/ST/code/BSP_B-L475E-IOT01/
