@@ -1,4 +1,4 @@
-# ESLab Final Flappy Bird
+# Embedded System Lab Final Project - Flappy Bird
 ![](./fig/bird.jpg)
 
 ### Table of content
@@ -21,8 +21,8 @@ pip install -r requirements.txt
 python3 rpi/internal/main.py
 ```
 - Run the Program
-  - Change SSID and Password in STM32/mbed_app.json
-  ![](./fig/ssid.png)
+  - Change SSID and Password in STM32/mbed_app.json  
+  ![](./fig/ssid.png)  
   - Add BSP_B-L475E-IOT01 to library in Mbed Studio
   - Replace main.cpp in the program
   - Compile and run the program
