@@ -1,4 +1,5 @@
 # ESLab Final Flappy Bird
+![](./fig/bird.jpg)
 
 ### Table of content
  - [Introduction](#introduction)
@@ -21,8 +22,10 @@ python3 rpi/internal/main.py
 ```
 - Run the Program
   - Change SSID and Password in STM32/mbed_app.json
+  ![](./fig/ssid.png)
   - Add BSP_B-L475E-IOT01 to library in Mbed Studio
   - Replace main.cpp in the program
+  - Compile and run the program
 
 ### Requirements
  - Python >= 3.6
