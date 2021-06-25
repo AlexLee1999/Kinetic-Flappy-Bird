@@ -56,5 +56,5 @@ https://www.youtube.com/watch?v=UZg49z76cLw
 Mbed Os documents with board sensors :  
 https://os.mbed.com/teams/ST/code/DISCO_L475VG_IOT01-Sensors-BSP/  
 BSP_B-L475E-IOT01 Library  
-https://os.mbed.com/teams/ST/code/BSP_B-L475E-IOT01/
+https://os.mbed.com/teams/ST/code/BSP_B-L475E-IOT01/  
 For more information, please read the report
