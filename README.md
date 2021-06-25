@@ -12,6 +12,7 @@
 ### Introduction
 
 This is the code of Embedded System Lab Final Project  
+The project mainly focus on using STM32 boards to control the Flappy Bird Game without gravity.
 Authors : B06203017 李俊諺 (Chun-Yen Lee)，B06504016 林家宏 (Chia-Hung Lin)，B06701214 王群博 (Cyun-Bo Wang)  
 
 ### Usage
@@ -45,14 +46,15 @@ python3 rpi/internal/main.py
 
 
 ### Screenshot
- - Game Play
+ - Game Play (With Different Icon)
 ![](./fig/game.png)  
 
 ### Reference
 
 Reference of the original game :  
 https://www.youtube.com/watch?v=UZg49z76cLw  
-MbedOs documents with board sensors :  
+Mbed Os documents with board sensors :  
 https://os.mbed.com/teams/ST/code/DISCO_L475VG_IOT01-Sensors-BSP/  
 BSP_B-L475E-IOT01 Library  
 https://os.mbed.com/teams/ST/code/BSP_B-L475E-IOT01/
+For more information, please read the report
