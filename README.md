@@ -45,8 +45,9 @@ python3 rpi/internal/main.py
 
 
 ### Screenshot
+ - Game Play
+![](./fig/game.png)  
 
-TBA
 ### Reference
 
 Reference of the original game :  
