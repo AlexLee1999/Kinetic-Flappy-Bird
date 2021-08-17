@@ -17,7 +17,7 @@ Authors : B06203017 李俊諺 (Chun-Yen Lee)，B06504016 林家宏 (Chia-Hung Li
 
 ### Usage
 - Install Requirements  
-```
+```bash
 python3 -m pip install -r requirements.txt
 python3 game/internal/main.py
 ```
@@ -47,9 +47,9 @@ python3 game/internal/main.py
 
 ### Screenshot
  - Game Play
-![](./fig/screenshot_1.png)
+![](./fig/screenshot_1.png =250x)
 
-![](./fig/screenshot_2.png)
+![](./fig/screenshot_2.png =250x)
 
 ### Reference
 
