@@ -46,7 +46,7 @@ python3 game/internal/main.py
 
 
 ### Screenshot
-Game Play Screen Shot 
+Game Play Screenshot 
  
 <img src="./fig/screenshot_2.png" width="500">
 
