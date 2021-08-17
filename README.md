@@ -46,10 +46,9 @@ python3 game/internal/main.py
 
 
 ### Screenshot
- - Game Play
-![](./fig/screenshot_1.png =250x)
-
-![](./fig/screenshot_2.png =250x)
+Game Play Screen Shot 
+ 
+<img src="./fig/screenshot_2.png" width="500">
 
 ### Reference
 
