@@ -18,8 +18,8 @@ Authors : B06203017 李俊諺 (Chun-Yen Lee)，B06504016 林家宏 (Chia-Hung Li
 ### Usage
 - Install Requirements  
 ```
-pip install -r requirements.txt
-python3 rpi/internal/main.py
+python3 -m pip install -r requirements.txt
+python3 game/internal/main.py
 ```
 - Run the Program
   - Change SSID and Password in STM32/mbed_app.json  
@@ -46,8 +46,10 @@ python3 rpi/internal/main.py
 
 
 ### Screenshot
- - Game Play (With Different Icon)
-![](./fig/game.png)  
+ - Game Play
+![](./fig/screenshot_1.png)
+
+![](./fig/screenshot_2.png)
 
 ### Reference
 

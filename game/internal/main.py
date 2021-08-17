@@ -25,7 +25,7 @@ def update():
 			data = conn.recv(1024).decode('utf-8')
 			try:
 				print(data[0])
-				action = ((int(data[0]) - 2)* -8)
+				action = ((int(data[0]) - 2) * -8)
 			except:
 				pass
 
@@ -128,10 +128,10 @@ floor_surface = pygame.image.load('../assets/base.png').convert()
 floor_surface = pygame.transform.scale2x(floor_surface)
 floor_x_pos = 0
 
-bird_downflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
-bird_midflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
-bird_upflap = pygame.transform.scale2x(pygame.image.load('../assets/mosquito.png').convert_alpha())
-bird_frames = [bird_downflap, bir		# print(pipe_velocity)d_midflap, bird_upflap]
+bird_downflap = pygame.transform.scale2x(pygame.image.load('../assets/bluebird-downflap.png').convert_alpha())
+bird_midflap = pygame.transform.scale2x(pygame.image.load('../assets/bluebird-midflap.png').convert_alpha())
+bird_upflap = pygame.transform.scale2x(pygame.image.load('../assets/bluebird-upflap.png').convert_alpha())
+bird_frames = [bird_downflap, bird_midflap, bird_upflap]
 bird_index = 0
 bird_surface = bird_frames[bird_index]
 bird_rect = bird_surface.get_rect(center = (100, 512))
