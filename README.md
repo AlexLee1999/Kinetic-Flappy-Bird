@@ -12,7 +12,7 @@
 ### Introduction
 
 This is the code of Embedded System Lab Final Project  
-The project mainly focus on using STM32 boards to control the Flappy Bird Game without gravity.
+The project mainly focus on using STM32 boards to control the Flappy Bird Game without gravity.  
 Authors : B06203017 李俊諺 (Chun-Yen Lee)，B06504016 林家宏 (Chia-Hung Lin)，B06701214 王群博 (Cyun-Bo Wang)  
 
 ### Usage
