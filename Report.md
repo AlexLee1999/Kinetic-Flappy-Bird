@@ -33,3 +33,18 @@ Also, if the filter is short, the signal isn't smooth. The graph below shows the
 
 <img src="./fig/filter.jpg" width="500">
 
+We proposed five directions for the players: fly up quickly, fly up slowly, remain height, drop slowly and drop quickly.
+We use the y-axis acceleration to decide the player’s direction, and the detailed threshold is listed below
+
+| Threshold            | Value  | Description    |
+|----------------------|--------|----------------|
+| data[y]<-500         | up = 4 | drop quickly   |
+| -500 <= data[y] <=50 | up=3   | drop slowly    |
+| -50 <= data[y] <=50  | up=2   | remain height  |
+| 50 <data[y] <=500    | up=1   | fly up slowly  |
+| 500<data[y]          | up=0   | fly up quickly |
+
+
+Moreover, we use the button as the Digital In. 
+When the player tilts the board, the button needs to be pressed to make the character move. 
+The primary purpose is to ensure accidental movement by the user.
