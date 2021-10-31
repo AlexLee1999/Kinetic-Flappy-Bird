@@ -51,7 +51,7 @@ We use the y-axis acceleration to decide the player’s direction, and the detai
 
 Moreover, we use the button as the Digital In. 
 When the player tilts the board, the button needs to be pressed to make the character move. 
-The primary purpose is to ensure accidental movement by the user.
+The primary purpose is to avoid accidental movement by the user.
 
 
 
