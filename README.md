@@ -20,7 +20,7 @@ In our game, we canceled the setting of gravity to make the players more possibl
 By tilting forward and backward, we can control the player up and down in the game. 
 The detailed flow chart is shown below.
 
-<img src="./fig/flow_chart.jpg" width="300">
+<img src="./fig/flow_chart.jpg" width="500">
 
 #### Data Processing
 The data processing part is processed in the client. 
