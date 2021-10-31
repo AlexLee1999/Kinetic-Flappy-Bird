@@ -42,11 +42,11 @@ We use the y-axis acceleration to decide the player’s direction, and the detai
 
 | Threshold            | Value  | Description    |
 |----------------------|--------|----------------|
-| data[y]<-500         | up = 4 | drop quickly   |
-| -500 <= data[y] <=50 | up=3   | drop slowly    |
-| -50 <= data[y] <=50  | up=2   | remain height  |
-| 50 <data[y] <=500    | up=1   | fly up slowly  |
-| 500<data[y]          | up=0   | fly up quickly |
+| data[y] < -500       | up = 4 | drop quickly   |
+| -500 <= data[y] <= 50| up = 3 | drop slowly    |
+| -50 <= data[y] <= 50 | up = 2 | remain height  |
+| 50 < data[y] <= 500  | up = 1 | fly up slowly  |
+| 500 <data[y]         | up = 0 | fly up quickly |
 
 
 Moreover, we use the button as the Digital In. 
