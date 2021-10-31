@@ -16,4 +16,20 @@ In our game, we canceled the setting of gravity to make the players more possibl
 By tilting forward and backward, we can control the player up and down in the game. 
 The detailed flow chart is shown below.
 
-<img src="./fig/flow_chart.png" width="300">
+<img src="./fig/flow_chart.jpg" width="300">
+
+### Data Processing
+The data processing part is processed in the client. 
+First, the accelerator collects the data and processes it using the queue. 
+We use the queue to store our data to reduce the time of reserving and deleting data. 
+After storing the data, we calculate the weighted average of the data. 
+The weight of the data strongly affects the user's experience of playing the game. 
+When testing our game, we found that the queue with size two and the weight (0.2, 0.8) is the best parameter.
+
+### Comparison of different ways to process data
+The data might encounter noise from the sensor when playing the game, so we use different ways to process the data. 
+When the queue size is large, that is, the filter's impulse response is long, the edge of the signal might disappear. 
+Also, if the filter is short, the signal isn't smooth. The graph below shows the difference.
+
+<img src="./fig/filter.jpg" width="500">
+
