@@ -1,4 +1,4 @@
-# Embedded System Lab Final Project - KFlappy Bird
+# Embedded System Lab Final Project - Kinetic Flappy Bird
 ![](./fig/bird.jpg)
 
 ### Introduction
